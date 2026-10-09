@@ -14,6 +14,34 @@ function App() {
   const [style, setStyle] = useState('Cinematic, natural, emotional');
   const [file, setFile] = useState(null);
 
+  const [backendStatus, setBackendStatus] = useState('Not tested');
+  const [testingBackend, setTestingBackend] = useState(false);
+
+  const testBackend = async () => {
+    setTestingBackend(true);
+    setBackendStatus('Testing...');
+
+    try {
+      const response = await fetch('/api/creator.mjs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ task: 'caption' })
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.ok === true) {
+        setBackendStatus('Connected successfully!');
+      } else {
+        setBackendStatus(`Error: ${data.message || response.status}`);
+      }
+    } catch {
+      setBackendStatus('Could not reach backend. Check your connection.');
+    } finally {
+      setTestingBackend(false);
+    }
+  };
+
   const next = () => setStep(s => Math.min(s + 1, steps.length - 1));
   const back = () => setStep(s => Math.max(0, s - 1));
 
@@ -52,7 +80,16 @@ function App() {
     }
   };
 
-  return <main><div className="app">{step > 0 && <button className="back" onClick={back}>‹</button>}{screen()}<div className="dots">{steps.map((_, i) => <i key={i} className={i === step ? 'on' : ''}/>)}</div></div></main>;
+  return <main><div className="app">{step > 0 && <button className="back" onClick={back}>‹</button>}{screen()}<div className="dots">
+<div className="card">
+  <small>DEVELOPER TEST</small>
+  <h2>Backend Connection</h2>
+  <button onClick={testBackend} disabled={testingBackend}>
+    {testingBackend ? 'Testing...' : 'Test Backend'}
+  </button>
+  <p>{backendStatus}</p>
+</div>
+{steps.map((_, i) => <i key={i} className={i === step ? 'on' : ''}/>)}</div></div></main>;
 }
 
 function Header({ title, sub }) {
