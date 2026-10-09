@@ -22,7 +22,7 @@ function App() {
     setBackendStatus('Testing...');
 
     try {
-      const response = await fetch('/api/creator.mjs', {
+      const response = await fetch('/api/creator', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ task: 'caption' })
